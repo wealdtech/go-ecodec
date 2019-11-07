@@ -44,9 +44,6 @@ func Encrypt(data []byte, key []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, errors.New("no key")
 	}
-	//	if len(key)%16 != 0 {
-	//		return nil, errors.New("key must be multiple of 16 bytes")
-	//	}
 	if len(data) < 16 {
 		return nil, errors.New("data must be at least 16 bytes")
 	}
