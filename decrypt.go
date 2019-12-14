@@ -43,11 +43,17 @@ func Decrypt(encryptedData []byte, key []byte) ([]byte, error) {
 	decryptionKey := pbkdf2.Key(key, salt, _pbkdf2c, _pbkdf2KeyLen, sha256.New)
 
 	h := sha256.New()
-	h.Write(decryptionKey[16:32])
-	h.Write(encryptedData[_versionLen+_saltLen+_ivLen+_checksumLen:])
+	_, err := h.Write(decryptionKey[16:32])
+	if err != nil {
+		return nil, err
+	}
+	_, err = h.Write(encryptedData[_versionLen+_saltLen+_ivLen+_checksumLen:])
+	if err != nil {
+		return nil, err
+	}
 	calculatedChecksum := h.Sum(nil)
 
-	if bytes.Compare(calculatedChecksum, checksum) != 0 {
+	if !bytes.Equal(calculatedChecksum, checksum) {
 		return nil, errors.New("invalid key")
 	}
 

@@ -33,7 +33,6 @@ const (
 
 	_pbkdf2c      = 2 ^ 18
 	_pbkdf2KeyLen = 32
-	_pbkdf2PRF    = "hmac-sha256"
 )
 
 // Encrypt encrypts some data given a secret.
@@ -53,12 +52,16 @@ func Encrypt(data []byte, key []byte) ([]byte, error) {
 
 	// Random salt
 	salt := make([]byte, _saltLen)
-	rand.Read(salt)
+	if _, err := rand.Read(salt); err != nil {
+		return nil, err
+	}
 	copy(encryptedData[_versionLen:], salt)
 
 	// Random IV
 	iv := make([]byte, _ivLen)
-	rand.Read(iv)
+	if _, err := rand.Read(iv); err != nil {
+		return nil, err
+	}
 	copy(encryptedData[_versionLen+_saltLen:], iv)
 
 	encryptionKey := pbkdf2.Key([]byte(key), salt, _pbkdf2c, _pbkdf2KeyLen, sha256.New)
@@ -73,8 +76,12 @@ func Encrypt(data []byte, key []byte) ([]byte, error) {
 
 	// Generate the checksum
 	h := sha256.New()
-	h.Write(encryptionKey[16:32])
-	h.Write(encryptedData[_versionLen+_saltLen+_ivLen+_checksumLen:])
+	if _, err := h.Write(encryptionKey[16:32]); err != nil {
+		return nil, err
+	}
+	if _, err := h.Write(encryptedData[_versionLen+_saltLen+_ivLen+_checksumLen:]); err != nil {
+		return nil, err
+	}
 	checksum := h.Sum(nil)
 	copy(encryptedData[_versionLen+_saltLen+_ivLen:_versionLen+_saltLen+_ivLen+_checksumLen], checksum)
 
