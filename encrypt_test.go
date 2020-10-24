@@ -16,6 +16,7 @@ package ecodec_test
 import (
 	"encoding/hex"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,7 +25,10 @@ import (
 )
 
 func _byteArray(input string) []byte {
-	res, _ := hex.DecodeString(input)
+	res, err := hex.DecodeString(strings.TrimPrefix(input, "0x"))
+	if err != nil {
+		panic(err)
+	}
 	return res
 }
 
@@ -97,7 +101,7 @@ func TestEncrypt(t *testing.T) {
 				assert.Equal(t, test.err.Error(), err.Error())
 			} else {
 				require.Nil(t, err)
-				// Can't test result due to random IV; results checked in round-trip testing
+				// Can't test result due to random IV; results checked in round-trip testing.
 			}
 		})
 	}

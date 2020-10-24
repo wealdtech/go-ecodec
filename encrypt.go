@@ -31,7 +31,7 @@ const (
 	_ivLen       = 16
 	_checksumLen = 32
 
-	_pbkdf2c      = 2 ^ 18
+	_pbkdf2c      = 262144
 	_pbkdf2KeyLen = 32
 )
 
@@ -64,7 +64,7 @@ func Encrypt(data []byte, key []byte) ([]byte, error) {
 	}
 	copy(encryptedData[_versionLen+_saltLen:], iv)
 
-	encryptionKey := pbkdf2.Key([]byte(key), salt, _pbkdf2c, _pbkdf2KeyLen, sha256.New)
+	encryptionKey := pbkdf2.Key(key, salt, _pbkdf2c, _pbkdf2KeyLen, sha256.New)
 
 	// Encrypt the data with the first 16 bytes of the encryption key
 	aesCipher, err := aes.NewCipher(encryptionKey[:16])
