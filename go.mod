@@ -3,8 +3,8 @@ module github.com/wealdtech/go-ecodec
 go 1.20
 
 require (
-	github.com/stretchr/testify v1.8.2
-	golang.org/x/crypto v0.6.0
+	github.com/stretchr/testify v1.8.4
+	golang.org/x/crypto v0.11.0
 )
 
 require (
